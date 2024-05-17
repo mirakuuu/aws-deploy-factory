@@ -22,4 +22,4 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
       - run: |
-          aws s3 sync . s3://${{ vars.S3_BUCKET }} --exclude "*" --include "*.yaml" --include "*.yml"
+          aws s3 sync . s3://${{ vars.S3_BUCKET }} --exclude "*" --include "*.yml"
