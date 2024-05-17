@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Active Directoy on EC2'
+
+Parameters:
+  YourIP:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: Your IP Address for RDP access
+
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: Select EC2 instance type for the Active Directory server.
+
+  WindowsAdministratorPassword:
+    Type: String
+    AllowedPattern: (?=^.{8,64}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9\s])(?=.*[a-z])|(?=.*[^A-Za-z0-9\s])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9\s]))^.*
+    Description: 'Enter AD Administrator Password.'
+    ConstraintDescription:
+        The password must be between 8 and 64 characters long and satisfy at least 3 of the following conditions
+        contains a number, an uppercase letter, a lowercase letter, or a special character (non-alphanumeric).
+
+  DomainName:
+    Type: String
+    Default: "example.com"
+    Description: The fully qualified domain name for the Active Directory domain.
+
+Resources:
+  ADEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Sub '{{resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-Japanese-Full-Base}}'
+      InstanceType: !Ref InstanceType
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          SubnetId: !ImportValue 'VPC1PublicSubnet1ID'
+          GroupSet:
+            - !Ref ADEC2SecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          <powershell>
+          $DomainName = "${DomainName}"
+          $DomainNetBIOSName = "${DomainNetBIOSName}"
+          $AdminPassword = ConvertTo-SecureString "${WindowsAdministratorPassword}" -AsPlainText -Force
+
+          Set-LocalUser -Name "Administrator" -Password $AdminPassword
+
+          Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
+
+          Install-ADDSForest `
+              -DomainName $DomainName `
+              -SafeModeAdministratorPassword $AdminPassword `
+              -Force `
+              -InstallDNS
+
+          Restart-Computer -Force
+          </powershell>
+      Tags:
+        - Key: Name
+          Value: 'Windows-AD'
+
+  ADEIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref ADEC2Instance
+      Tags:
+        - Key: Name
+          Value: 'windows-ad-eip'
+
+  ADEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'Security group for AD EC2 instance'
+      VpcId: !ImportValue 'VPC1ID'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: !Ref YourIP
+
+Outputs:
+  WindowsAdministratorPassword:
+    Value: !Ref WindowsAdministratorPassword
+    Export:
+      Name: 'WindowsAdministratorPassword'
+
+  ADEIP:
+    Value: !Ref ADEIP
+    Export:
+      Name: 'ADEIP'
+
+  ADPrivateIP:
+    Value: !GetAtt ADEC2Instance.PrivateIp
+    Export:
+      Name: 'ADPrivateIP'
+
+  ADEC2SecurityGroupID:
+    Value: !Ref ADEC2SecurityGroup
+    Export:
+      Name: 'ADEC2SecurityGroupID'
+
+  ADEC2InstanceID:
+    Value: !Ref ADEC2Instance
+    Export:
+      Name: 'ADEC2InstanceID'
+
+  DomainName:
+    Description: The fully qualified domain name for the Active Directory domain.
+    Value: !Ref DomainName
+    Export:  
+      Name: !Sub 'DomainName'

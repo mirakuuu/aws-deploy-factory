@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: "MSAD Deployment"
+
+Parameters:
+  ADPassword:
+    Type: String
+    AllowedPattern: (?=^.{8,64}$)((?=.*\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[^A-Za-z0-9\s])(?=.*[a-z])|(?=.*[^A-Za-z0-9\s])(?=.*[A-Z])(?=.*[a-z])|(?=.*\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9\s]))^.*
+    Description: 'Enter AD Administrator Password.'
+    ConstraintDescription:
+        The password must be between 8 and 64 characters long and satisfy at least 3 of the following conditions
+        contains a number, an uppercase letter, a lowercase letter, or a special character (non-alphanumeric).
+
+  DomainName:
+    Type: String
+    Default: "example.com"
+    Description: The fully qualified domain name for the Active Directory domain.
+
+Resources:
+  Directory: 
+    Type: AWS::DirectoryService::MicrosoftAD
+    Properties: 
+      Edition: Standard
+      Name: !Ref DomainName
+      Password: !Ref ADPassword
+      VpcSettings: 
+        SubnetIds: 
+          - !ImportValue 'VPC1PrivateSubnet1ID'
+          - !ImportValue 'VPC1PrivateSubnet2ID'
+        VpcId: !ImportValue 'VPC1ID'
+
+Outputs:
+  ADPassword:
+    Value: !Ref ADPassword
+    Export:
+      Name: 'ADPassword'
+
+  ADUser:
+    Value: 'Admin'
+    Export:
+      Name: 'ADUser'
+
+  MSADIpIpAddresses:
+    Value: !Join [",", !GetAtt Directory.DnsIpAddresses]
+    Export:
+      Name: 'MSADIpIpAddresses'
+

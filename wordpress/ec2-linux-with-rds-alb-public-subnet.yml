@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'WordPress Linux Instance with cross-stack references and ALB'
+
+Parameters:
+  YourIP:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: Your IP Address for HTTP access
+    
+  MySQLAdminPassword:
+    Type: String
+    Description: Password for RDS MySQL admin user
+
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: Select EC2 instance type for WordPress Instance.
+
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+    Description: Select RDS instance type for WordPress DB.
+
+Resources:
+  WordPressEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow HTTP traffic from ALB
+      VpcId: !ImportValue 'VPC1ID'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+
+  ALBSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow HTTP traffic from YourIP
+      VpcId: !ImportValue 'VPC1ID'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref YourIP
+
+  WordPressLinuxInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Sub '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64}}'
+      InstanceType: !Ref InstanceType
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          SubnetId: !ImportValue 'VPC1PublicSubnet1ID'
+          GroupSet:
+            - !Ref WordPressEC2SecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          dnf update -y
+          dnf install -y httpd wget php-fpm php-mysqli php-json php php-devel mariadb105
+          wget http://ja.wordpress.org/latest-ja.tar.gz -P /tmp/
+          tar zxvf /tmp/latest-ja.tar.gz -C /tmp
+          cp -r /tmp/wordpress/* /var/www/html/
+          chown apache:apache -R /var/www/html
+          systemctl enable httpd.service
+          systemctl start httpd.service
+      Tags:
+        - Key: Name
+          Value: 'WordPress-linux'
+
+  MySQLSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow MySQL access from WordPress EC2 instance
+      VpcId: !ImportValue 'VPC1ID'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref WordPressEC2SecurityGroup
+
+  MySQLInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      Engine: mysql
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: '20'
+      DBInstanceIdentifier: wordpress-mysql
+      MasterUsername: admin
+      MasterUserPassword: !Ref MySQLAdminPassword
+      AvailabilityZone: !Sub '${AWS::Region}a'
+      DBSubnetGroupName: !ImportValue 'VPC1DBSubnetGroupID'
+      VPCSecurityGroups:
+        - !Ref MySQLSecurityGroup
+
+  LoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: wordpress-alb
+      Subnets:
+        - !ImportValue 'VPC1PublicSubnet1ID'
+        - !ImportValue 'VPC1PublicSubnet2ID'
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+      Scheme: internet-facing
+
+  ALBTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Port: 80
+      Protocol: HTTP
+      VpcId: !ImportValue 'VPC1ID'
+      HealthCheckPath: /wp-includes/images/blank.gif
+      HealthCheckPort: traffic-port
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 5
+      UnhealthyThresholdCount: 2
+      TargetType: instance
+      Targets:
+        - Id: !Ref WordPressLinuxInstance
+          Port: 80
+
+  ALBListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+Outputs:
+  WordPressURL:
+    Description: "The HTTP URL of WordPress"
+    Value: !Sub "http://${LoadBalancer.DNSName}"

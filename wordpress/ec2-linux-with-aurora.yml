@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'WordPress Linux Instance with cross-stack references'
+
+Parameters:
+  YourIP:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: Your IP Address for HTTP access
+
+  MySQLAdminPassword:
+    Type: String
+    Description: Password for RDS MySQL admin user
+
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    Description: Select EC2 instance type for WordPress Instance.
+
+  DBInstanceClass:
+    Type: String
+    Default: db.t4g.medium
+    Description: Select RDS instance type for WordPress DB.
+
+Resources:
+  WordPressEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow HTTP traffic from YourIP
+      VpcId: !ImportValue 'VPC1ID'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref YourIP
+
+  WordPressLinuxInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !Sub '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64}}'
+      InstanceType: !Ref InstanceType
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          SubnetId: !ImportValue 'VPC1PublicSubnet1ID'
+          GroupSet:
+            - !Ref WordPressEC2SecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          dnf update -y
+          dnf install -y httpd wget php-fpm php-mysqli php-json php php-devel mariadb105
+          wget http://ja.wordpress.org/latest-ja.tar.gz -P /tmp/
+          tar zxvf /tmp/latest-ja.tar.gz -C /tmp
+          cp -r /tmp/wordpress/* /var/www/html/
+          chown apache:apache -R /var/www/html
+          systemctl enable httpd.service
+          systemctl start httpd.service
+      Tags:
+        - Key: Name
+          Value: 'WordPress-linux'
+
+  WordPressEIP:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref WordPressLinuxInstance
+      Tags:
+        - Key: Name
+          Value: 'WordPress-linux-eip'
+
+  MySQLSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow MySQL access from WordPress EC2 instance
+      VpcId: !ImportValue 'VPC1ID'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref WordPressEC2SecurityGroup
+
+  AuroraMySQLCluster:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      Engine: aurora-mysql
+      EngineVersion: '8.0'
+      DBClusterIdentifier: wordpress-aurora-mysql
+      MasterUsername: !Ref MySQLAdminPassword
+      MasterUserPassword: !Ref MySQLAdminPassword
+      DBSubnetGroupName: !ImportValue 'VPC1DBSubnetGroupID'
+      VpcSecurityGroupIds:
+        - !Ref MySQLSecurityGroup
+
+  AuroraMySQLInstance1:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      DBInstanceClass: !Ref DBInstanceClass
+      DBClusterIdentifier: !Ref AuroraMySQLCluster
+      Engine: aurora-mysql
+      AvailabilityZone: !Sub '${AWS::Region}a'
+      DBInstanceIdentifier: wordpress-aurora-mysql-instance1
+
+Outputs:
+  WordPressURL:
+    Description: "The HTTP URL of WordPress"
+    Value: !Sub "http://${WordPressEIP}"
