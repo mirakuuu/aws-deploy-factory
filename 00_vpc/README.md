@@ -8,9 +8,7 @@
 2. CloudFormationの画面に遷移します。
 3. 必要なパラメータを設定し、デプロイを実行してください。
 
-![image](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/c2d15fc9-8371-479b-94b0-4e433118e12e)(https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=https%3A%2F%2Faws-deploy-factory-ap-northeast-1.s3.ap-northeast-1.amazonaws.com%2F00_vpc%2Fvpc.yml&stackName=VpcStack&param_VPC1Name=vpc1&param_VPC1Cidr=10.0.0.0%2F16&param_VPC1AZOption=2&param_VPC1NatGatewayOption=false)
-
-![deploy](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/c2d15fc9-8371-479b-94b0-4e433118e12e)(https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=https%3A%2F%2Faws-deploy-factory-ap-northeast-1.s3.ap-northeast-1.amazonaws.com%2F00_vpc%2Fvpc.yml&stackName=VpcStack&param_VPC1Name=vpc1&param_VPC1Cidr=10.0.0.0%2F16&param_VPC1AZOption=2&param_VPC1NatGatewayOption=false)
+[<img src="https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/c2d15fc9-8371-479b-94b0-4e433118e12e">](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=https%3A%2F%2Faws-deploy-factory-ap-northeast-1.s3.ap-northeast-1.amazonaws.com%2F00_vpc%2Fvpc.yml&stackName=VpcStack&param_VPC1Name=vpc1&param_VPC1Cidr=10.0.0.0%2F16&param_VPC1AZOption=2&param_VPC1NatGatewayOption=false)
 
 ## パラメータ
 
