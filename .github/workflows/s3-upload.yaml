@@ -5,10 +5,12 @@ on:
     branches: ["main"]
     paths-ignore:
       - '**/README.md'
+      - '**/*.sh'
   pull_request:
     branches: ["main"]
     paths-ignore:
       - '**/README.md'
+      - '**/*.sh'
   workflow_dispatch:
 
 jobs:
