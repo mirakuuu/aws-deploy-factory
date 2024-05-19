@@ -43,7 +43,7 @@
 
 ## WordPressのインストール方法
 
-- [スタック一覧](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks)にアクセスして、表示される WordPressEC2RDSStackをクリックして、スタックの詳細を表示します。
+- [スタック一覧](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks)にアクセスして、表示される **WordPressEC2RDSStack**をクリックして、スタックの詳細を表示します。
 - **出力** タブをクリックします
   - **DBHostname** に記載している、値をメモします
   - **WordPressURL** に表示されている URL をクリックします
