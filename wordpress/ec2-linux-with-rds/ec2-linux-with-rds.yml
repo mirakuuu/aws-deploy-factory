@@ -97,3 +97,7 @@ Outputs:
   WordPressURL:
     Description: "The HTTP URL of WordPress"
     Value: !Sub "http://${WordPressEIP}"
+
+  DBHostname:
+    Description: "The hostname of the MySQL database"
+    Value: !GetAtt MySQLInstance.Endpoint.Address
