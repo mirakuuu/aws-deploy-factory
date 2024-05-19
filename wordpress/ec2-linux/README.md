@@ -1,4 +1,4 @@
-# WordPress on Sigle EC2
+# WordPress on Single EC2
 
 このテンプレートを使用すると、WordPress と MySQL がインストールされた WordPress を構築できます。
 
