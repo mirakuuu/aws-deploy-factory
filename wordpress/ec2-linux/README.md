@@ -37,7 +37,7 @@
 
 ## WordPressのインストール方法
 
-- [ここから](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks?filteringStatus=active&filteringText=WordPressEC2Stack&viewNested=true)にアクセスして、表示される WordPressEC2Stackをクリックして、スタックの詳細を表示します。
+- [作成したスタック](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks?filteringStatus=active&filteringText=WordPressEC2Stack&viewNested=true)にアクセスして、表示される WordPressEC2Stackをクリックして、スタックの詳細を表示します。
 - **出力** タブをクリックして、**WordPressURL** に表示されている URL をクリックします
 - WordpPressの設定画面につながるので「さあ、はじめましょう！」をクリックします
 - 以下の情報を入力して、「送信」をクリックします
@@ -45,7 +45,7 @@
   - ユーザー名: admin
   - パスワード: **MySQLAdminPassword** で入力したパスワード
   - データベースのホスト名: localhost
-  - テーブル接頭辞: wp_ デフォルトのまま
+  - テーブル接頭辞: wp_ (デフォルトのまま)
 - インストール実行をクリックします
 - サイトのタイトルなどを入力して、「WordPress をインストール」をクリックします
   - （入力例）
