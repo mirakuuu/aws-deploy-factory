@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Amazon FSx for Windows File Server. SSD and Sigle AZ'
+
+Parameters:
+ StorageCapacity:
+   Type: Number
+   Description: Storage Size for FSx Windows. Must be more than 32 GB
+   Default: 32
+
+  ThroughputCapacity:
+    Type: Number 
+    Description: Throughput capacity for FSx for Windows File Server
+    Default: 8
+    AllowedValues:
+      - 8
+      - 16 
+      - 32
+      - 64
+      - 128
+
+
+Resources:
+  FSxWindowsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for FSx for Windows file system
+      VpcId: !ImportValue 'VPC1ID'
+      SecurityGroupIngress:
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
+          SourceSecurityGroupId: !ImportValue 'ADEC2SecurityGroupID'
+
+  ADEC2SecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !ImportValue 'ADEC2SecurityGroupID'
+      IpProtocol: '-1'
+      FromPort: -1
+      ToPort: -1
+      SourceSecurityGroupId: !Ref FSxWindowsSecurityGroup
+
+  FSxWindows1:
+    Type: AWS::FSx::FileSystem
+    Properties:
+      FileSystemType: WINDOWS
+      StorageCapacity: !Ref StorageCapacity
+      StorageType: SSD
+      SubnetIds:
+        - !ImportValue 'VPC1PrivateSubnet1ID'
+      SecurityGroupIds:
+        - !Ref FSxWindowsSecurityGroup
+      Tags:
+        - Key: Name
+          Value: "fsx-windows-hdd-single-az"
+      WindowsConfiguration:
+        SelfManagedActiveDirectoryConfiguration:
+          DnsIps:
+            - !ImportValue 'ADPrivateIP'
+          DomainName: !ImportValue 'DomainName'
+          UserName: Administrator
+          Password: !ImportValue 'WindowsAdministratorPassword'
+        ThroughputCapacity: !Ref ThroughputCapacity
+        DeploymentType: SINGLE_AZ_2
+
+Outputs:
+
+  FileSystemId:
+    Value: !Ref FSxWindows1
+    Description: The ID of the Amazon FSx for Windows file system
