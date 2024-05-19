@@ -4,7 +4,7 @@
 
 ## デプロイする構成
 
-![fsx-windows](https://github.com/username/repo/assets/fsx-windows.png)
+![fsx-windows-single-ssd](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/70b51632-ef79-4018-b480-0c6b9fa84f11)
 
 ## 前提条件
 
@@ -39,15 +39,7 @@
 
 ## FSx for Windows へのアクセス方法
 
-1. [Active Directory スタック](https://github.com/username/repo/tree/main/01_active_directory)で作成した EC2 インスタンスに RDP 接続します。
-
-2. スタートメニューから `fsmgmt.msc` を起動します。
-
-3. **Action** メニューから **Connect to another computer...** を選択します。
-
-4. [FSx コンソール](https://console.aws.amazon.com/fsx/home?region=ap-northeast-1#file-systems)から、作成した FSx for Windows のファイルシステム ID をコピーして、**Another computer** に貼り付けます。
-
-5. **OK** をクリックすると、FSx for Windows に接続されます。
+(作成中)
 
 ## 削除方法
 
@@ -56,5 +48,8 @@
 ## トラブルシューティング
 
 - 作成中に CloudFormation で「No export named VPC1ID found. Rollback requested by user」というエラーが表示されて、作成が失敗した場合
-  - 「前提条件」を確認して、VPC スタックと Active Directory スタックのデプロイを行ってください。
+  - 「前提条件」を確認して、VPC スタックのデプロイを行ってください。
+  - その後、FSxWindowsStack を一度削除して、もう一度、スタックの作成を行ってください。
+- 作成中に CloudFormation で「No export named ADPrivateIP found. Rollback requested by user」というエラーが表示されて、作成が失敗した場合
+  - 「前提条件」を確認して、Active Directory スタックのデプロイを行ってください。
   - その後、FSxWindowsStack を一度削除して、もう一度、スタックの作成を行ってください。
