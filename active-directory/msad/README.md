@@ -4,7 +4,7 @@
 
 ## デプロイする構成
 
-![MSAD](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/d3d7cc55-ebd3-4819-8d10-4faa30220926)
+![MSAD](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/518b7a08-5d78-4522-b112-0951ffff231d)
 
 ## 前提条件
 
