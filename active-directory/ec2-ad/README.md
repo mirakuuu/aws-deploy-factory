@@ -4,7 +4,7 @@
 
 ## デプロイする構成
 
-![active-directory](https://github.com/username/repo/assets/active-directory.png)
+![AD on EC2](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/ac91cb8f-4a99-4e89-9300-50c359fe4c77)
 
 ## 前提条件
 
@@ -40,18 +40,19 @@
 
 ### DomainName
 
-- 説明: Active Directory のドメイン名（FQDN）
+- 説明: Active Directory のドメイン名
 - デフォルト値: example.com
 
 ## Active Directory への接続方法
 
-- [スタック一覧](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks)にアクセスして、表示される ActiveDirectoryStack をクリックして、スタックの詳細を表示します。  
+- [スタック一覧](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks)にアクセスして、表示される ADStack をクリックして、スタックの詳細を表示します。  
 
 - **出力** タブをクリックして、**ADEIP** に表示されているパブリック IP アドレスをコピーします。
 
 - Remote Desktop などの RDP クライアントを使用して、コピーした IP アドレスに接続します。  
 
-- ユーザー名に `Administrator`、パスワードに **WindowsAdministratorPassword** で入力したパスワードを使用してログインします。
+- ユーザー名に `Administrator@example.com`、パスワードに **WindowsAdministratorPassword** で入力したパスワードを使用してログインします。
+  - ドメイン名を example.com から変更した場合は変更後に ドメイン名に置き換えてください。
 
 ## 削除方法
 
@@ -62,3 +63,5 @@
 - 作成中に CloudFormation で「No export named VPC1ID found. Rollback requested by user」というエラーが表示されて、作成が失敗した場合
   - 「前提条件」を確認して、VPC スタックのデプロイをまず行ってください。  
   - その後、ActiveDirectoryStack を一度削除して、もう一度、スタックの作成を行ってください。
+- 「ValidationError: Parameter WindowsAdministratorPassword failed to satisfy constraint: The password must be between 8 and 64 characters long and satisfy at least 3 of the following conditions contains a number, an uppercase letter, a lowercase letter, or a special character (non-alphanumeric).」と表示されてスタックが作成できない場合
+  - WindowsAdministratorPassword が 8〜64文字で、数字、大文字、小文字、特殊文字のうち3つ以上を含んでいることを確認してください。
