@@ -86,7 +86,7 @@ Resources:
       Engine: mysql
       DBInstanceClass: !Ref DBInstanceClass
       AllocatedStorage: '20'
-      DBInstanceIdentifier: wordpress-mysql
+      DBInstanceIdentifier: wordpress-mysql-alb
       MasterUsername: admin
       MasterUserPassword: !Ref MySQLAdminPassword
       DBName: wordpress

@@ -1,9 +1,9 @@
 # WordPress on EC2 and RDS MySql
 
-このテンプレートを使用すると、EC2 インスタンスと RDS MySQL で構成された環境をデプロイできます。
+このテンプレートを使用すると、ロードバランサー(ALB）、EC2 インスタンス、RDS MySQL で構成された環境をデプロイできます。
 
 ## デプロイする構成
-![ec2-linux-with-rds](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/bddc433c-de4a-4cee-b64b-eb72fd375f0a)
+![ec2-linux-with-rds-alb-public-subnet](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/a5dad8e3-4381-4f03-bf64-d656ac9fcc94)
 
 ## 前提条件
 
@@ -17,7 +17,7 @@
 2. CloudFormationの画面に遷移します。
 3. 必要に応じてパラメータを変更して、スタックを作成してください。
 
-[<img src="https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/c2d15fc9-8371-479b-94b0-4e433118e12e">](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/create?stackName=WordPressEC2RDSStack&templateURL=https://aws-deploy-factory-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/wordpress/ec2-linux-with-rds/ec2-linux-with-rds.yml)
+[<img src="https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/c2d15fc9-8371-479b-94b0-4e433118e12e">](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/create?stackName=WordPressEC2RDSALBStack&templateURL=https://aws-deploy-factory-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/wordpress/ec2-linux-with-rds-alb-public-subnet/ec2-linux-with-rds-alb-public-subnet.yml)
 
 ## パラメータ
 
@@ -43,7 +43,7 @@
 
 ## WordPressのインストール方法
 
-- [スタック一覧](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks)にアクセスして、表示される WordPressEC2RDSStackをクリックして、スタックの詳細を表示します。
+- [スタック一覧](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks)にアクセスして、表示される WordPressEC2RDSALBStackをクリックして、スタックの詳細を表示します。
 - **出力** タブをクリックします
   - **DBHostname** に記載している、値をメモします
   - **WordPressURL** に表示されている URL をクリックします
@@ -73,4 +73,4 @@
 ## トラブルシューティング
 - 作成中に CloudFormationで「No export named VPC1ID found. Rollback requested by user」というエラーが表示されて、作成が失敗した場合
   - 「前提条件」を確認して、VPCスタックのデプロイをまず行ってください。
-  - その後、WordPressEC2RDSStack を一度削除して、もう一度、スタックの削除を行ってください。
+  - その後、WordPressEC2RDSALBStack を一度削除して、もう一度、スタックの削除を行ってください。
