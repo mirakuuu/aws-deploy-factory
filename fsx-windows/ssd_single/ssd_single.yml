@@ -2,10 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Amazon FSx for Windows File Server. SSD and Sigle AZ'
 
 Parameters:
- StorageCapacity:
-   Type: Number
-   Description: Storage Size for FSx Windows. Must be more than 32 GB
-   Default: 32
+  StorageCapacity:
+    Type: Number
+    Description: Storage Size for FSx Windows. Must be more than 32 GB
+    Default: 32
 
   ThroughputCapacity:
     Type: Number 
