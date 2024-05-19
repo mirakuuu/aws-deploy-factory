@@ -1,9 +1,9 @@
-# WordPress on Single EC2
+# WordPress on EC2 and RDS MySql
 
-このテンプレートを使用すると、WordPress と MySQL がインストールされた WordPress を構築できます。
+このテンプレートを使用すると、EC2 インスタンスと RDS MySQL で構成された環境をデプロイできます。
 
 ## デプロイする構成
-![ec2-linux](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/983c0d97-f029-4c6c-b45a-5a5953624929)
+![ec2-linux-with-rds](https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/bddc433c-de4a-4cee-b64b-eb72fd375f0a)
 
 ## 前提条件
 
@@ -17,7 +17,7 @@
 2. CloudFormationの画面に遷移します。
 3. 必要に応じてパラメータを変更して、スタックを作成してください。
 
-[<img src="https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/c2d15fc9-8371-479b-94b0-4e433118e12e">](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/create?stackName=WordPressEC2Stack&templateURL=https://aws-deploy-factory-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/wordpress/ec2-linux/ec2-linux.yml)
+[<img src="https://github.com/mirakuuu/aws-deploy-factory/assets/159740576/c2d15fc9-8371-479b-94b0-4e433118e12e">](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/create?stackName=WordPressEC2RDSStack&templateURL=https://aws-deploy-factory-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/wordpress/ec2-linux-with-rds/ec2-linux-with-rds.yml)
 
 ## パラメータ
 
@@ -28,16 +28,22 @@
 
 ### MySQLAdminPassword
 
-- 説明: WordPress用MySQLユーザーのパスワード
+- 説明: RDS MySQL admin ユーザーのパスワード
+- 制約: 8～41 文字
+
+### DBInstanceClass
+
+- 説明: WordPress用のRDS DBインスタンスクラス
+- デフォルト値: db.t3.micro
 
 ### InstanceType
 
-- 説明: WordPress用ののEC2インスタンスタイプ
+- 説明: WordPress用のEC2インスタンスタイプ
 - デフォルト値: t2.micro
 
 ## WordPressのインストール方法
 
-- [スタック一覧](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks)にアクセスして、表示される WordPressEC2Stack をクリックして、スタックの詳細を表示します。
+- [作成したスタック](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks?filteringStatus=active&filteringText=WordPressEC2Stack&viewNested=true)にアクセスして、表示される WordPressEC2Stackをクリックして、スタックの詳細を表示します。
 - **出力** タブをクリックして、**WordPressURL** に表示されている URL をクリックします
 - WordpPressの設定画面につながるので「さあ、はじめましょう！」をクリックします
 - 以下の情報を入力して、「送信」をクリックします

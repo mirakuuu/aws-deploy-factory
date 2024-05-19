@@ -86,7 +86,8 @@ Resources:
       AllocatedStorage: '20'
       DBInstanceIdentifier: wordpress-mysql
       MasterUsername: admin
-      MasterUserPassword: !Ref MySQLAdminPassword  
+      MasterUserPassword: !Ref MySQLAdminPassword
+      DBName: wordpress
       AvailabilityZone: !Sub '${AWS::Region}a'
       DBSubnetGroupName: !ImportValue 'VPC1DBSubnetGroupID'
       VPCSecurityGroups:
