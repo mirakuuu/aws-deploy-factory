@@ -40,7 +40,6 @@ Resources:
         Fn::Base64: !Sub |
           <powershell>
           $DomainName = "${DomainName}"
-          $DomainNetBIOSName = "${DomainNetBIOSName}"
           $AdminPassword = ConvertTo-SecureString "${WindowsAdministratorPassword}" -AsPlainText -Force
 
           Set-LocalUser -Name "Administrator" -Password $AdminPassword
